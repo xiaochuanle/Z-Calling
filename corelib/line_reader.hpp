@@ -1,0 +1,58 @@
+#ifndef __LINE_READER_HPP
+#define __LINE_READER_HPP
+
+#include "hbn_aux.h"
+#include "../str_util/ncbistr.hpp"
+
+#include <string>
+
+using NStr::CTempString;
+
+class CBufferLineReader
+{
+public:
+    /*
+    Read from the file, "-" (but not "./") means standard input
+    An explicit call to operator++ or
+    ReadLine() will bbe necessaray to fetch the first line
+    */
+    CBufferLineReader(const char* filename);
+
+    ~CBufferLineReader();
+
+    bool            AtEOF() const;
+    char            PeekChar() const;
+    CBufferLineReader&  operator++();
+    void            UngetLine();
+    CTempString     operator*() const;
+    size_t          GetPosition() const;
+    size_t          GetLineNumber() const;
+    const char*     GetFileName() const { return m_FileName.c_str(); }
+
+private:
+    CBufferLineReader(const CBufferLineReader&);
+    CBufferLineReader& operator=(const CBufferLineReader&);
+
+private:
+    void x_LoadLong();
+    bool x_ReadBuffer();
+    
+private:
+    std::string     m_FileName;
+    gzFile          m_Reader;
+    bool            m_Eof;
+    bool            m_UngetLine;
+    size_t          m_LastReadSize;
+    size_t          m_BufferSize;
+    char*           m_Buffer;
+    const char*     m_Pos;
+    const char*     m_End;
+    CTempString     m_Line;
+    std::string     m_String;
+    size_t          m_InputPos;
+    size_t          m_LineNumber;
+};
+
+typedef CBufferLineReader HbnLineReader;
+
+#endif // __LINE_READER_HPP
