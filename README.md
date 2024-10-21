@@ -33,16 +33,14 @@ sudo apt-get -y install cuda
 ```
 
 **Install the following packages before building the program:**
-
 1. boost
-
 2. zlib
 
 **And the these projects are already included in `3rdparty/`**
 
-4. [argparse](https://github.com/p-ranav/argparse "argparse"): Argument Parser for Modern C++
-5. [htslib](https://github.com/samtools/htslib "htslib"): An implementation of a unified C library for accessing common file formats
-6. [libsvm](https://github.com/cjlin1/libsvm "libsvm"): An efficient software for SVM classification and regression.
+3. [argparse](https://github.com/p-ranav/argparse "argparse"): Argument Parser for Modern C++
+4. [htslib](https://github.com/samtools/htslib "htslib"): An implementation of a unified C library for accessing common file formats
+5. [libsvm](https://github.com/cjlin1/libsvm "libsvm"): An efficient software for SVM classification and regression.
 
 
 ```bash
