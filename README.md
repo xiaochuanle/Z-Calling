@@ -8,7 +8,7 @@ Z-Calling is a machine-learning based tool for (1) distinguishing dZ-DNA molecul
 
 ### Preparing the Python Environment
 
-Create a virtual environment using Conda. The Python scripts require numpy (version 20.0 or higher) and pytorch (version 2.0 or higher) with CUDA 11.8 support.
+Create a virtual environment using Conda. The Python scripts require numpy (version 20.0 or higher) and pytorch (version 2.0 or higher).
 
 ```bash
 conda create -n Z-Calling python=3.11
@@ -18,19 +18,7 @@ pip install numpy torch==2.0.1
 
 ### Building the C++ Program
 
-Z-Calling was tested and runed in **NVIDIA GeForce RTX 3090**,  ensure you have a **GPU** and **CUDA Toolkit 11.8** installed.  Download **libtorch 2.0.1** if it's not already included in your Python environment. This C++ program is compiled using g++-11.2 on Ubuntu 22.04.
-
-**If you are not familiar about how to install CUDA Toolkit 11.8, here is a example for set up CUDA Toolkit 11.8 in ubuntu 22.04 x86_64 system**
-
-```bash
-wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
-sudo mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
-wget https://developer.download.nvidia.com/compute/cuda/11.8.0/local_installers/cuda-repo-ubuntu2204-11-8-local_11.8.0-520.61.05-1_amd64.deb
-sudo dpkg -i cuda-repo-ubuntu2204-11-8-local_11.8.0-520.61.05-1_amd64.deb
-sudo cp /var/cuda-repo-ubuntu2204-11-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
-sudo apt-get update
-sudo apt-get -y install cuda
-```
+Z-Calling was tested and runed in **CPU**.  Download **libtorch 2.0.1** if it's not already included in your Python environment.
 
 **Install the following packages before building the program:**
 1. boost
@@ -42,31 +30,9 @@ sudo apt-get -y install cuda
 4. [htslib](https://github.com/samtools/htslib "htslib"): An implementation of a unified C library for accessing common file formats
 5. [libsvm](https://github.com/cjlin1/libsvm "libsvm"): An efficient software for SVM classification and regression.
 
-
 ```bash
-cd z-calling-base
 mkdir build && cd build
 cmake -DCMAKE_PREFIX_PATH=`python -c 'import torch;print(torch.utils.cmake_prefix_path)'` .. # Determine the cmake path # if you haven`t set up the python environment, you should directy include libtorch path here.
-make -j
-
-cd z-calling-read
-mkdir build && cd build
-cmake ..
-make -j
-
-cd z-bam2txt
-mkdir build && cd build
-cmake ..
-make -j
-
-cd z-freq
-mkdir build && cd build
-cmake ..
-make -j
-
-cd z-seq
-mkdir build && cd build
-cmake ..
 make -j
 ```
 
@@ -91,8 +57,7 @@ pbmm2 align REF FilteredBAM FilteredMappingBAM --preset CCS --sort
 ### Z-calling for base and read
 #### Running MLP module
 ```bash
-cd z-calling-base
-./z-calling-base -k Kmer_size -t Threads_num Bam_path Model_path Output_bam_path
+build/z-calling-base -k Kmer_size -t Threads_num Bam_path Model_path Output_bam_path
 
 Positional arguments:
   Kmer_size              K-mer size for Z calling (21 when using k21-full-ZA model, and 11 when using k11-mixed-AZ model)
@@ -105,8 +70,7 @@ Positional arguments:
 ```
 #### Running SVM classifier on reads containing ZP tag.
 ```bash
-cd z-calling-read
-./z-calling-read predict Bam_path Result_path Model_path length_threshold section_num
+build/z-calling-read predict Bam_path Result_path Model_path length_threshold section_num
 
 Positional arguments:
   Bam_path              Path to the Z-base called BAM file
@@ -125,8 +89,7 @@ python py/SVM_LR_analysis.py --SVM z-calling-read-Result_path --read_ref read_Re
 
 #### Optional: convert ZP tag bam into tab delimited table file. Per A/T Z probabilities were reported in six columns (unmapped) or eight column format (mapped, corresponding reference coordinate also reported).
 ```bash
-cd z-bam2txt
-./z-bam2txt -zp -t Threads_num Bam_path - > Result_path
+build/z-bam2txt -zp -t Threads_num Bam_path - > Result_path
 
 Positional arguments:
   Threads_num           Number of CPU threads (default: 16)
@@ -136,8 +99,7 @@ Positional arguments:
 
 ### Covert Z-Called BAM into six-alphabet fasta file
 ```bash
-cd z-seq
-./z-seq Bam_path Result_path
+build/z-seq Bam_path Result_path
 
 Positional arguments:
   Bam_path              Path to the Z-base called BAM file
@@ -146,8 +108,7 @@ Positional arguments:
 
 ### Calculate Z/(A+Z) at each reference A/T bases for a mapped bam
 ```bash
-cd z-freq
-./zfreq input_tsv output_tsv
+build/zfreq input_tsv output_tsv
 
 Positional arguments:
   input_tsv           Path to the converted tab delimited table file
