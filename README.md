@@ -21,14 +21,13 @@ pip install numpy torch==2.0.1
 Z-Calling was tested and runed in **CPU**.  Download **libtorch 2.0.1** if it's not already included in your Python environment.
 
 **Install the following packages before building the program:**
-1. boost
-2. zlib
+1. zlib
 
 **And the these projects are already included in `3rdparty/`**
 
-3. [argparse](https://github.com/p-ranav/argparse "argparse"): Argument Parser for Modern C++
-4. [htslib](https://github.com/samtools/htslib "htslib"): An implementation of a unified C library for accessing common file formats
-5. [libsvm](https://github.com/cjlin1/libsvm "libsvm"): An efficient software for SVM classification and regression.
+2. [argparse](https://github.com/p-ranav/argparse "argparse"): Argument Parser for Modern C++
+3. [htslib](https://github.com/samtools/htslib "htslib"): An implementation of a unified C library for accessing common file formats
+4. [libsvm](https://github.com/cjlin1/libsvm "libsvm"): An efficient software for SVM classification and regression.
 
 ```bash
 mkdir build && cd build
