@@ -30,6 +30,12 @@ Z-Calling was tested and runed in **CPU**.  Download **libtorch 2.0.1** if it's 
 4. [libsvm](https://github.com/cjlin1/libsvm "libsvm"): An efficient software for SVM classification and regression.
 
 ```bash
+cd 3rdparty/htslib
+tar -xjf htslib-1.21.tar.bz2
+cd htslib-1.21
+make
+cp libhts.so ../
+cd ../../..
 mkdir build && cd build
 cmake -DCMAKE_PREFIX_PATH=`python -c 'import torch;print(torch.utils.cmake_prefix_path)'` .. # Determine the cmake path # if you haven`t set up the python environment, you should directy include libtorch path here.
 make -j
