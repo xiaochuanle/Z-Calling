@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
 
-## project name
 project(Z-Calling)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -18,6 +17,7 @@ ENDMACRO()
 
 find_package(Torch REQUIRED)
 find_package(ZLIB REQUIRED)
+find_package(Threads REQUIRED)
 
 link_directories(
         3rdparty/htslib
@@ -69,10 +69,10 @@ SUBDIRLIST(SUBDIRS ${CMAKE_CURRENT_SOURCE_DIR})
 foreach (dirname IN LISTS SUBDIRS)
     if (${dirname} MATCHES "z-bam2txt")
         add_executable(z-bam2txt ${z-bam2txt_LIST})
-        target_link_libraries(z-bam2txt "libhts.so" ${ZLIB_LIBRARIES})
+        target_link_libraries(z-bam2txt "libhts.so" ${ZLIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
     elseif (${dirname} MATCHES "z-calling-base")
         add_executable(z-calling-base ${z-calling-base_LIST})
-        target_link_libraries(z-calling-base "libhts.so" ${TORCH_LIBRARIES} ${ZLIB_LIBRARIES})
+        target_link_libraries(z-calling-base "libhts.so" ${TORCH_LIBRARIES} ${ZLIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
     elseif (${dirname} MATCHES "z-calling-read")
         add_executable(z-calling-read ${z-calling-read_LIST})
         target_link_libraries(z-calling-read "libhts.so")
