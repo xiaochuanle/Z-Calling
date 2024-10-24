@@ -13,7 +13,7 @@ Create a virtual environment using Conda. The Python scripts require numpy (vers
 ```bash
 conda create -n Z-Calling python=3.11
 conda activate Z-Calling
-pip install numpy torch==2.0.1
+pip install numpy torch==2.0.1 --index-url https://download.pytorch.org/whl/cpu
 ```
 
 ### Building the C++ Program
