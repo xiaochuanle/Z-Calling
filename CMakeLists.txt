@@ -20,7 +20,7 @@ find_package(Torch REQUIRED)
 find_package(ZLIB REQUIRED)
 
 link_directories(
-        3rdparty/htslib/lib
+        3rdparty/htslib
 )
 include_directories(
         3rdparty/htslib/include
