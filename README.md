@@ -35,6 +35,7 @@ tar -xjf htslib-1.21.tar.bz2
 cd htslib-1.21
 make
 cp libhts.so ../
+cp libhts.so ../libhts.so.3
 cd ../../..
 mkdir build && cd build
 cmake -DCMAKE_PREFIX_PATH=`python -c 'import torch;print(torch.utils.cmake_prefix_path)'` .. # Determine the cmake path # if you haven`t set up the python environment, you should directy include libtorch path here.
