@@ -4,6 +4,16 @@
 
 Z-Calling is a machine-learning based tool for (1) distinguishing dZ-DNA molecules from ordinary DNAs and (2) calling Z bases in A/Z-coexisting DNAs. Z-Calling also has implemented a pipeline for detecting taxonomic or sequence sources of dZ-DNAs in mixed datasets. In multiple tested datasets, Z-Calling has faithfully identified souces of dZ-DNAs without false positive discory. And its Z base calling module has achieved AUCs ranging from 0.9422 to 0.9550 and F1 scores ranging from 0.85-0.92 across all tested datasets.
 
+## Computational Requirements & Installation
+
+### System Requirements
+Z-Calling is designed to run on standard Linux environments and does **not** require GPU acceleration.
+
+* **Operating System:** Linux
+* **Memory (RAM):** ≥ 32 GB recommended (Peak memory usage is approx. 31 GB during base calling)
+* **Processor:** Standard Multi-core CPU (Benchmarked on AMD EPYC 7402 24-Core Processor)
+* **Disk Space:** Sufficient space for input BAMs and output files
+
 ## Building from Scratch
 
 ### Preparing the Python Environment
