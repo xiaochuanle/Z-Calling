@@ -137,29 +137,29 @@ To identify the species origin of dZ-DNA reads:
 
 \# 1\. Convert filtered BAM to FASTA  
 ```bash
-samtools fasta \-@8 FilteredBAM \> Filtered.fasta
+samtools fasta -@8 FilteredBAM > Filtered.fasta
 ```
 \# 2\. Map to reference and filter for high divergence (suggesting dZ-DNA)  
 ```bash
-minimap2 \-t 8 \-x map-hifi $REF Filtered.fasta | \\  
-  awk '\!a\[$1\]++' | \\  
-  awk '($4-$3/$2)\>0.4 {match($0, /dv:f:(\[0-9.\]+)/, a); if (a\[1\]\<0.05) {print $1"\\t"$6}}' \> read\_RefContig.tsv
+minimap2 -t 8 -x map-hifi $REF Filtered.fasta | \  
+  awk '!a[$1]++' | \  
+  awk '($4-$3/$2)>0.4 {match($0, /dv:f:([0-9.]+)/, a); if (a[1]<0.05) {print $1"\t"$6}}' > read_RefContig.tsv
 ```
 \# 3\. Perform LR Analysis  
 ```bash
-python py/SVM\_LR\_analysis.py \--SVM z-calling-read-Result\_path \\  
-  \--read\_ref read\_RefContig.tsv \\  
-  \[ \--ref\_species RefContig\_Spcecies.tsv \] \\  
-  \--output SVM.LR.tsv
+python py/SVM_LR_analysis.py --SVM z-calling-read-Result_path \  
+  --read_ref read_RefContig.tsv \  
+  [ --ref_species RefContig_Spcecies.tsv ] \  
+  --output SVM.LR.tsv
 ```
 #### **B. Convert Z-Calls to Table (z-bam2txt)**
 
 Convert the BAM file with ZP tags into a tab-delimited text file.
 ```bash
-build/z-bam2txt \-zp \-t 16 \<Input\_BAM\> \- \[Reference\_Fasta\] \> \<Result.tsv\>
+build/z-bam2txt -zp -t 16 <Input_BAM> - [Reference_Fasta] > <Result.tsv>
 ```
 Important Note on Reference Fasta:  
-While the \[Reference\_Fasta\] argument is optional for basic conversion, it is mandatory if you plan to run zfreq analysis afterwards. You must provide the exact same reference file that was used for the alignment step to ensuring mapping coordinates match.  
+While the [Reference_Fasta] argument is optional for basic conversion, it is mandatory if you plan to run zfreq analysis afterwards. You must provide the exact same reference file that was used for the alignment step to ensuring mapping coordinates match.  
 **Output Format:**
 
 * Mapped Reads (8 columns):  
@@ -174,24 +174,24 @@ Generate a FASTA file where modified bases are represented by distinct character
 * **Z**: Represents dZ  
 * **O**: Represents a T paired with dZ (on the opposite strand)
 ```bash
-build/z-seq \<Input\_BAM\> \<Output.fasta\>
+build/z-seq <Input_BAM> <Output.fasta>
 ```
 #### **D. Calculate Aggregated Z-Frequencies (zfreq)**
 
 Calculate the ratio of Z bases at each reference coordinate (Z / (A+Z)).
 ```bash
-build/zfreq \-i \<Input\_TSV\> \-o \<Output\_Freq.tsv\>
+build/zfreq -i <Input_TSV> -o <Output_Freq.tsv>
 ```
-* **Input\_TSV**: The output file from z-bam2txt (must be mapped reads).  
-* **Output\_Freq.tsv**: The final frequency report.
+* **Input_TSV**: The output file from z-bam2txt (must be mapped reads).  
+* **Output_Freq.tsv**: The final frequency report.
 
 **Output Format (zfreq):**
 
 1. **chr**: Reference chromosome name.  
 2. **coor**: Reference coordinate.  
-3. **num\_records\_above\_threshold**: Count of bases classified as Z (high probability).  
-4. **num\_records\_below\_threshold**: Count of bases classified as A (low probability).  
-5. **ratio\_above\_threshold**: The Z-ratio (Count\_Z / Total).
+3. **num_records_above_threshold**: Count of bases classified as Z (high probability).  
+4. **num_records_below_threshold**: Count of bases classified as A (low probability).  
+5. **ratio_above_threshold**: The Z-ratio (Count_Z / Total).
 
 ## **Example Analysis**
 We provide example datasets to test the Z-Calling modules. The data includes:
@@ -204,7 +204,7 @@ To perform the analysis, simply navigate to the example\_data directory and run 
 
 ```bash
 conda activate Z-Calling
-cd example\_data  
-bash run\_examples.sh
+cd example_data  
+bash run_examples.sh
 ```
 This script will automatically perform filtering, alignment, base calling, read classification, and frequency analysis.
