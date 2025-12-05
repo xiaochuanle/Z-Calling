@@ -1,0 +1,21 @@
+name: Z-Calling
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  # System
+  - python=3.10          # Staying on 3.10 is safest for C++ compilation
+  - pip
+  - htslib
+  - zlib
+  - libsvm
+  - cmake
+  - make
+  - cxx-compiler
+  
+  # Python
+  - pip:
+    - numpy<2.0          # Strictly required for PyTorch compatibility
+    - --index-url https://download.pytorch.org/whl/cpu
+    - torch==2.2.2       # <--- FIX: Moving to a stable, bug-free release
