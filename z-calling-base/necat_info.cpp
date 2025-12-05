@@ -23,12 +23,6 @@ void dump_necat_info(FILE* out)
 
     int cpu_threads = thread::hardware_concurrency();
 
-    fprintf(out, "\n");
-    fprintf(out, "PROGRAM:\n");
-    fprintf(out, "  Name:           %s\n", HBN_PACKAGE_NAME);
-    fprintf(out, "  Version:        %s\n", HBN_PACKAGE_VERSION);
-    fprintf(out, "  Description:    Alignment, correction and assembly toolkit for Oxford Nanopore sequencing reads\n");
-    fprintf(out, "  Contact:        chenying2016@gmail.com\n");
 
     fprintf(out, "\n");
     fprintf(out, "SYSTEM:\n");
