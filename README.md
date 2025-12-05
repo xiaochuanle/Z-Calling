@@ -21,6 +21,7 @@ Z-Calling is designed to run on CPU. The installation process uses Conda (or Mam
 ### 1. Download this repository.
 ```base
 git clone https://github.com/xiaochuanle/Z-Calling.git
+cd Z-Calling
 ```
 
 ### 2. Set up the Environment
@@ -48,7 +49,7 @@ cmake ..
 make -j
 ```
 Once compilation is complete, the executables (such as z-calling-base and z-bam2txt) will be located in the build/ directory.
-Optionally: Add Z-Calling/build to your APTH.
+Optionally: Add Z-Calling/build to your PATH.
 
 ## Z-Calling Usage
 
