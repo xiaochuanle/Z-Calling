@@ -73,11 +73,15 @@ int main(int argc, char* argv[]) {
         }
 
         // Check if there are enough columns
+        // Mapped reads have 8 columns, Unmapped have 6. We only process mapped.
         if (columns.size() < 8) {
             continue;
         }
 
-        // Extract relevant columns
+        // Extract relevant columns based on z-bam2txt output format:
+        // Col 5: Reference Name (chr)
+        // Col 6: Reference Coordinate (coor)
+        // Col 7: Probability (prob)
         std::string chr = columns[5];
         int coor = std::stoi(columns[6]);
         double prob = std::stod(columns[7]);
@@ -100,7 +104,16 @@ int main(int argc, char* argv[]) {
         const std::string& chr_coor_key = entry.first;
         const Record& record = entry.second;
 
-        size_t delimiter_pos = chr_coor_key.find('_');
+        // FIX: Use rfind (reverse find) to find the LAST underscore.
+        // This ensures correct parsing even if chromosome names contain underscores 
+        // (e.g., "chr1_gl000191_random_100").
+        size_t delimiter_pos = chr_coor_key.rfind('_');
+        
+        if (delimiter_pos == std::string::npos) {
+             std::cerr << "Warning: Malformed key found: " << chr_coor_key << std::endl;
+             continue;
+        }
+
         std::string chr = chr_coor_key.substr(0, delimiter_pos);
         int coor = std::stoi(chr_coor_key.substr(delimiter_pos + 1));
 
@@ -119,13 +132,13 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    output_file << "chr	coor	num_records_above_threshold	num_records_below_threshold	ratio_above_threshold\n";
+    output_file << "chr\tcoor\tnum_records_above_threshold\tnum_records_below_threshold\tratio_above_threshold\n";
     for (const auto& entry : sorted_records) {
         const ChrCoor& chr_coor = entry.chr_coor;
         const Record& record = entry.record;
 
         int total_records = record.count_above_threshold + record.count_below_threshold;
-        double ratio = static_cast<double>(record.count_above_threshold) / total_records;
+        double ratio = (total_records > 0) ? static_cast<double>(record.count_above_threshold) / total_records : 0.0;
 
         output_file << chr_coor.chr << "\t" << chr_coor.coor << "\t" << record.count_above_threshold << "\t"
                     << record.count_below_threshold << "\t" << std::fixed << std::setprecision(2) << ratio << "\n";
