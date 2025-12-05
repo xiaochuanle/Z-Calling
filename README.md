@@ -15,40 +15,36 @@ Z-Calling is designed to run on standard Linux environments and does **not** req
 * **Disk Space:** Sufficient space for input BAMs and output files
 
 ## Building from Scratch
-
+Z-Calling is designed to run on CPU. The installation process uses Conda (or Mamba) to handle all dependencies automatically, including HTSlib, PyTorch, and the necessary C++ compilers. This eliminates the need for manual library compilation.
 ### Preparing the Python Environment
 
-Create a virtual environment using Conda. The Python scripts require numpy (version 20.0 or higher) and pytorch (version 2.0 or higher).
-
-```bash
-conda create -n Z-Calling python=3.11
-conda activate Z-Calling
-pip install numpy torch==2.0.1 --index-url https://download.pytorch.org/whl/cpu
+### 1. Download this repository.
+```base
+git clone https://github.com/xiaochuanle/Z-Calling.git
 ```
 
-### Building the C++ Program
-
-Z-Calling was tested and runed in **CPU**.  Download **libtorch 2.0.1** if it's not already included in your Python environment.
-
-**Install the following packages before building the program:**
-1. zlib
-
-**And the these projects are already included in `3rdparty/`**
-
-2. [argparse](https://github.com/p-ranav/argparse "argparse"): Argument Parser for Modern C++
-3. [htslib](https://github.com/samtools/htslib "htslib"): An implementation of a unified C library for accessing common file formats
-4. [libsvm](https://github.com/cjlin1/libsvm "libsvm"): An efficient software for SVM classification and regression.
+### 2. Set up the Environment
+We strongly recommend using Mamba for faster environment resolution, though standard Conda will also work. The environment.yml file in the root directory of the project.
+Run the following commands to create the environment:
 
 ```bash
-cd 3rdparty/htslib
-tar -xjf htslib-1.21.tar.bz2
-cd htslib-1.21
-make
-cp libhts.so ../
-cp libhts.so ../libhts.so.3
-cd ../../..
-mkdir build && cd build
-cmake -DCMAKE_PREFIX_PATH=`python -c 'import torch;print(torch.utils.cmake_prefix_path)'` .. # Determine the cmake path # if you haven`t set up the python environment, you should directy include libtorch path here.
+# Option A: Using Mamba (Recommended - Faster)
+mamba env create -f environment.yml
+
+# Option B: Using Standard Conda (Slower)
+conda env create -f environment.yml
+```
+Once the environment is created, activate it and test if torch is successfully installed:
+```bash
+conda activate Z-Calling
+python -c "import torch; print(torch.__version__)"  # Successful installation will print '2.2.2+cpu'
+```
+
+### 3. Building the Program
+```bash
+mkdir build
+cd build
+cmake ..
 make -j
 ```
 
@@ -69,6 +65,8 @@ Positional arguments:
 Optional: Mapping filtered BAM to a reference fasta file
 pbmm2 align REF FilteredBAM FilteredMappingBAM --preset CCS --sort
 ```
+Once compilation is complete, the executables (such as z-calling-base and z-bam2txt) will be located in the build/ directory.
+Optionally: Add Z-Calling/build to your APTH.
 
 ### Z-calling for base and read
 #### Running MLP module
