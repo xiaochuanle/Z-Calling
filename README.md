@@ -138,3 +138,19 @@ Positional arguments:
   input_tsv           Path to the converted tab delimited table file
   output_tsv          Path to the output table file
 ```
+
+## **Example Analysis**
+We provide example datasets to test the Z-Calling modules. The data includes:
+
+* **100 dZ-DNA reads** (modified amplicon from E. coli).  
+* **100 native DNA reads** (control from E. coli).
+
+### **Running the Test**
+To perform the analysis, simply navigate to the example\_data directory and run the automated script:
+
+```bash
+conda activate Z-Calling
+cd example\_data  
+bash run\_examples.sh
+```
+This script will automatically perform filtering, alignment, base calling, read classification, and frequency analysis.
