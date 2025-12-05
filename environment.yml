@@ -4,7 +4,7 @@ channels:
   - bioconda
   - nodefaults
 dependencies:
-  # System
+  # System & Build Tools
   - python=3.10          # Staying on 3.10 is safest for C++ compilation
   - pip
   - htslib
@@ -13,11 +13,12 @@ dependencies:
   - cmake
   - make
   - cxx-compiler
+  - pbmm2                # <--- ADDED: PacBio wrapper for minimap2
   
-  # Python
+  # Python Packages
   - pip:
     - numpy<2.0          # Strictly required for PyTorch compatibility
     - pandas
     - pysam
     - --index-url https://download.pytorch.org/whl/cpu
-    - torch==2.2.2       # <--- FIX: Moving to a stable, bug-free release
+    - torch==2.2.2       # Stable, bug-free release
