@@ -45,7 +45,5 @@ HbnRunningInfo::~HbnRunningInfo() {
     double dur = hbn_time_diff(&M_begin, &M_end);
     size_t peak_ram = getPeakRSS();
     string size = NStr::UInt8ToString_DataSize(peak_ram);
-    fprintf(stderr, "\n\n");
-    fprintf(stderr, "%s Wallclock time: %.2f seconds.\n", HBN_PACKAGE_NAME, dur);
-    fprintf(stderr, "%s Peak RAM usage: %s\n", HBN_PACKAGE_NAME, size.c_str());
+
 }
