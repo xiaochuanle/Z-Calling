@@ -47,6 +47,8 @@ cd build
 cmake ..
 make -j
 ```
+Once compilation is complete, the executables (such as z-calling-base and z-bam2txt) will be located in the build/ directory.
+Optionally: Add Z-Calling/build to your APTH.
 
 ## Z-Calling Usage
 
@@ -65,8 +67,6 @@ Positional arguments:
 Optional: Mapping filtered BAM to a reference fasta file
 pbmm2 align REF FilteredBAM FilteredMappingBAM --preset CCS --sort
 ```
-Once compilation is complete, the executables (such as z-calling-base and z-bam2txt) will be located in the build/ directory.
-Optionally: Add Z-Calling/build to your APTH.
 
 ### Z-calling for base and read
 #### Running MLP module
