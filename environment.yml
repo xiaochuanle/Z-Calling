@@ -17,5 +17,7 @@ dependencies:
   # Python
   - pip:
     - numpy<2.0          # Strictly required for PyTorch compatibility
+    - pandas
+    - pysam
     - --index-url https://download.pytorch.org/whl/cpu
     - torch==2.2.2       # <--- FIX: Moving to a stable, bug-free release
