@@ -24,17 +24,16 @@ Z-Calling is designed to run on standard Linux environments and does **not** req
 * **Processor:** Standard Multi-core CPU (Benchmarked on AMD EPYC 7402 24-Core Processor)
 * **Disk Space:** Sufficient space for input BAMs and output files
 
-## Building from Scratch
+### Building from Scratch
 Z-Calling is designed to run on CPU. The installation process uses Conda (or Mamba) to handle all dependencies automatically, including HTSlib, PyTorch, and the necessary C++ compilers. This eliminates the need for manual library compilation.
-### Preparing the Python Environment
 
-### 1. Download this repository.
+#### 1. Download this repository.
 ```base
 git clone https://github.com/xiaochuanle/Z-Calling.git
 cd Z-Calling
 ```
 
-### 2. Set up the Environment
+#### 2. Set up the Environment
 We strongly recommend using Mamba for faster environment resolution, though standard Conda will also work. The environment.yml file in the root directory of the project.
 Run the following commands to create the environment:
 
@@ -51,7 +50,7 @@ conda activate Z-Calling
 python -c "import torch; print(torch.__version__)"  # Successful installation will print '2.2.2+cpu'
 ```
 
-### 3. Building the Program
+#### 3. Building the Program
 ```bash
 mkdir build
 cd build
