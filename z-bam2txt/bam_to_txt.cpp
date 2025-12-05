@@ -571,7 +571,6 @@ int main(int argc, char* argv[])
     }
 
     base_size = NStr::UInt8ToString_DataSize(total_bases);
-    fprintf(stderr, "Extract %zu samples in %d reads (%s)\n", total_samples, total_reads, base_size.c_str());
 
     return 0;
 }
