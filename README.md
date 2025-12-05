@@ -2,7 +2,17 @@
 
 ## Brief Introduction
 
-Z-Calling is a machine-learning based tool for (1) distinguishing dZ-DNA molecules from ordinary DNAs and (2) calling Z bases in A/Z-coexisting DNAs. Z-Calling also has implemented a pipeline for detecting taxonomic or sequence sources of dZ-DNAs in mixed datasets. In multiple tested datasets, Z-Calling has faithfully identified souces of dZ-DNAs without false positive discory. And its Z base calling module has achieved AUCs ranging from 0.9422 to 0.9550 and F1 scores ranging from 0.85-0.92 across all tested datasets.
+Z-Calling is a machine-learning toolkit designed to detect and call 2,6-diaminopurine (Z-base) modifications using PacBio HiFi reads.
+
+## Core Features
+
+- **Molecule Classification:** Distinguishes dZ-DNA molecules from canonical (A) DNA.
+- **Base Calling:** Precisely identifies Z bases within hybrid A/Z sequences.
+- **Source Detection:** A pipeline to identify taxonomic sources of dZ-DNAs in mixed datasets with zero false positive discovery in benchmarking.
+
+## Performance
+
+Across multiple datasets, the Z base calling module achieves **AUCs of 0.94–0.96** and **F1 scores of 0.85–0.92**.
 
 ## Computational Requirements & Installation
 
