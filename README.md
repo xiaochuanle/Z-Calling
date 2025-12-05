@@ -194,17 +194,19 @@ build/zfreq -i <Input_TSV> -o <Output_Freq.tsv>
 5. **ratio_above_threshold**: The Z-ratio (Count_Z / Total).
 
 ## **Example Analysis**
-We provide example datasets to test the Z-Calling modules. The data includes:
+We provide example datasets (example_data.tar.gz) to test the Z-Calling modules. The data includes:
 
 * **100 dZ-DNA reads** (modified amplicon from E. coli).  
 * **100 native DNA reads** (control from E. coli).
+* E. coli reference genome in the dir Ref/.
 
 ### **Running the Test**
 To perform the analysis, simply navigate to the example\_data directory and run the automated script:
 
 ```bash
 conda activate Z-Calling
-cd example_data  
+cd example_data
+tar -xvzf example_data.tar.gz
 bash run_examples.sh
 ```
-This script will automatically perform filtering, alignment, base calling, read classification, and frequency analysis.
+This script will automatically perform filtering, alignment, base calling, read classification, and frequency analysis. Tsv outputs from running this script are availabe in example_results.tar.gz in the same dir. 
