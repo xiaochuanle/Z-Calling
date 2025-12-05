@@ -60,84 +60,134 @@ make -j
 Once compilation is complete, the executables (such as z-calling-base and z-bam2txt) will be located in the build/ directory.
 Optionally: Add Z-Calling/build to your PATH.
 
-## Z-Calling Usage
+## **Z-Calling Usage**
 
-### Filters were applied to filter BAM reads
-#### 1. kinetic signals (fi, ri, fp, rp tags) are required. Otherwise Z-Calling will quit.
-#### 2. Reads with (Median_PW / median_IPD < 0.3) or (Median_PW / median_IPD > 99percentile) were filtered.
-#### 3. The default minimum pass number for forward (fn) and reverse (rn) passs is 3 (fn>=3 and rn>=3).
+### **1\. Pre-processing: Filter BAM Reads**
 
-```bash
-python py/filter_bam.py -b RawBAM -o FilteredBAM
+Before analysis, reads must be filtered to remove low-quality data and ensure kinetic signals are present.
 
-Positional arguments:
-  RawBAM            Input bam could be either mapped or unmapped
-  FilteredBAM       Output path to the filtered BAM file    
+**Filtering Criteria:**
 
-Optional: Mapping filtered BAM to a reference fasta file
-pbmm2 align REF FilteredBAM FilteredMappingBAM --preset CCS --sort
-```
+1. **Required Tags:** Kinetic signals (fi, ri, fp, rp) must be present.  
+2. **Signal Quality:** Reads with Median\_PW / Median\_IPD \< 0.3 or \> 99th percentile are discarded.  
+3. **Passes:** Minimum 3 passes required for both forward (fn \>= 3\) and reverse (rn \>= 3\) strands.
 
-### Z-calling for base and read
-#### Running MLP module
-```bash
-build/z-calling-base -k Kmer_size -t Threads_num Bam_path Model_path Output_bam_path
+python py/filter\_bam.py \-b \<RawBAM\> \-o \<FilteredBAM\>
 
-Positional arguments:
-  Kmer_size              K-mer size for Z calling (21 when using k21-full-ZA model, and 11 when using k11-mixed-AZ model)
-  Threads_num            Number of CPU threads (default: 16)
-  Bam_path               Path to the input BAM file
-  Model_path             Path to the trained model
-                         Running MLP module with k21-full-ZA model. dZ-DNA read detection: the model was trained on full-dA/dZ datasets and intended to be used for dZ-DNA read classification only.
-                         Running MLP module with k11-mixed-AZ model. Single-nucleotide Z/A classification: a ZP tag will be added to reads that records the Z probability for each A/T base in the sequence.
-  Output_bam_path        Path to the result BAM file
-```
-#### Running SVM classifier on reads containing ZP tag.
-```bash
-build/z-calling-read predict Bam_path Result_path Model_path length_threshold section_num
+* **RawBAM**: Input BAM file (mapped or unmapped) containing kinetic tags.  
+* **FilteredBAM**: Output path for the clean BAM file.
 
-Positional arguments:
-  Bam_path              Path to the Z-base called BAM file
-  Result_path           Path to result tsv file
-  Model_path            Path to the trained model 
-  length_threshold      The minimum number of bases (default: 500)
-  section_num           The number of intervals (default: 100)
-```
+(Optional) Alignment:  
+If your input was unmapped, align the filtered reads to a reference:  
+pbmm2 align REF.fasta FilteredBAM FilteredMappingBAM.bam \--preset CCS \--sort
 
-#### Taxonomic source of dZ-DNA reads
-```bash
-samtools fasta -@8 FilteredBAM > Filteredfasta
-minimap2 -t 8 -x map-hifi $REF Filteredfasta | awk '!a[$1]++' | awk '($4-$3/$2)>0.4 {match($0, /dv:f:([0-9.]+)/, a); if (a[1]<0.05) {print $1"\t"$6}}' > read_RefContig.tsv
-python py/SVM_LR_analysis.py --SVM z-calling-read-Result_path --read_ref read_RefContig.tsv [ --ref_species RefContig_Spcecies.tsv ] --output SVM.LR.tsv
-```
+### **2\. Z-Calling (Base & Read Level)**
 
-#### Optional: convert ZP tag bam into tab delimited table file. Per A/T Z probabilities were reported in six columns (unmapped) or eight column format (mapped, corresponding reference coordinate also reported).
-```bash
-build/z-bam2txt -zp -t Threads_num Bam_path - > Result_path
+#### **A. Run the MLP Module (Base Calling)**
 
-Positional arguments:
-  Threads_num           Number of CPU threads (default: 16)
-  Bam_path              Path to the Z-base called BAM file
-  Result_path           Path to result tsv file
-```
+Perform base-level modification calling. Choose the model based on your goal.
 
-### Covert Z-Called BAM into six-alphabet fasta file
-```bash
-build/z-seq Bam_path Result_path
+Available Models:  
+The package includes three pre-trained models located in the model/ directory:
 
-Positional arguments:
-  Bam_path              Path to the Z-base called BAM file
-  Result_path           Path to result fasta file
-```
+1. **model/k21-full-ZA/scripted\_m21.pth** (Use with \-k 21\)  
+   * **Purpose:** dZ-DNA read detection.  
+   * **Description:** Trained on full-dA/dZ datasets. Intended for classifying entire reads as dZ-modified or native.  
+2. **model/k11-mixed-AZ/scripted\_m11.pth** (Use with \-k 11\)  
+   * **Purpose:** Single-nucleotide Z/A classification.  
+   * **Description:** Adds a ZP tag to reads recording the Z probability for each A/T base. Best for site-specific analysis.
 
-### Calculate Z/(A+Z) at each reference A/T bases for a mapped bam
-```bash
-build/zfreq input_tsv output_tsv
+build/z-calling-base \-k \<Kmer\_size\> \-t \<Threads\> \<Input\_BAM\> \<Model\_Path\> \<Output\_BAM\>
 
-Positional arguments:
-  input_tsv           Path to the converted tab delimited table file
-  output_tsv          Path to the output table file
-```
+| Argument | Description |
+| :---- | :---- |
+| \-k | **21** for the k21-full-ZA model. **11** for the k11-mixed-AZ model. |
+| \-t | Number of CPU threads (default: 16). |
+| Input\_BAM | Path to the input BAM file. |
+| Model\_Path | Path to the .pth model file (see list above). |
+| Output\_BAM | Output BAM file. Modifications are stored in MM and ML tags. |
+
+#### **B. Run SVM Classifier (Read Level)**
+
+Predict the modification status of entire reads using the ZP tags generated by the k21 model.
+
+Model:  
+3\. model/svm/k21ReadClassifier: The pre-trained SVM classifier used for this step.  
+build/z-calling-read predict \<Input\_BAM\> \<Result\_TSV\> \<Model\_Path\> \<min\_len\> \<intervals\>
+
+* **Model\_Path**: Path to the SVM model (e.g., model/svm/k21ReadClassifier).  
+* **min\_len**: Minimum read length to classify (Required: must be **\>= 500**).  
+* **intervals**: Number of sections to split the read into for feature extraction (Required: must be exactly **100** for the current model).
+
+Output Format (Result\_TSV):  
+The output is a tab-separated file with two columns:
+
+1. **Read Name**  
+2. **Classification**:  
+   * \+: dZ-DNA (Modified)  
+   * \-: Canonical DNA (Unmodified)  
+   * Otherwise: Unclassified (likely failed length criteria)
+
+### **3\. Downstream Analysis**
+
+#### **A. Taxonomic Source of dZ-DNA Reads**
+
+To identify the species origin of dZ-DNA reads:
+
+\# 1\. Convert filtered BAM to FASTA  
+samtools fasta \-@8 FilteredBAM \> Filtered.fasta
+
+\# 2\. Map to reference and filter for high divergence (suggesting dZ-DNA)  
+minimap2 \-t 8 \-x map-hifi $REF Filtered.fasta | \\  
+  awk '\!a\[$1\]++' | \\  
+  awk '($4-$3/$2)\>0.4 {match($0, /dv:f:(\[0-9.\]+)/, a); if (a\[1\]\<0.05) {print $1"\\t"$6}}' \> read\_RefContig.tsv
+
+\# 3\. Perform LR Analysis  
+python py/SVM\_LR\_analysis.py \--SVM z-calling-read-Result\_path \\  
+  \--read\_ref read\_RefContig.tsv \\  
+  \[ \--ref\_species RefContig\_Spcecies.tsv \] \\  
+  \--output SVM.LR.tsv
+
+#### **B. Convert Z-Calls to Table (z-bam2txt)**
+
+Convert the BAM file with ZP tags into a tab-delimited text file.
+
+build/z-bam2txt \-zp \-t 16 \<Input\_BAM\> \- \[Reference\_Fasta\] \> \<Result.tsv\>
+
+Important Note on Reference Fasta:  
+While the \[Reference\_Fasta\] argument is optional for basic conversion, it is mandatory if you plan to run zfreq analysis afterwards. You must provide the exact same reference file that was used for the alignment step to ensuring mapping coordinates match.  
+**Output Format:**
+
+* Mapped Reads (8 columns):  
+  QueryName, ReadID, Strand, QueryPos, Base, RefName, RefPos, Probability  
+* Unmapped Reads (6 columns):  
+  QueryName, ReadID, Strand, QueryPos, Base, Probability
+
+#### **C. Convert to 6-Alphabet FASTA (z-seq)**
+
+Generate a FASTA file where modified bases are represented by distinct characters.
+
+* **Z**: Represents dZ  
+* **O**: Represents a T paired with dZ (on the opposite strand)
+
+build/z-seq \<Input\_BAM\> \<Output.fasta\>
+
+#### **D. Calculate Aggregated Z-Frequencies (zfreq)**
+
+Calculate the ratio of Z bases at each reference coordinate (Z / (A+Z)).
+
+build/zfreq \-i \<Input\_TSV\> \-o \<Output\_Freq.tsv\>
+
+* **Input\_TSV**: The output file from z-bam2txt (must be mapped reads).  
+* **Output\_Freq.tsv**: The final frequency report.
+
+**Output Format (zfreq):**
+
+1. **chr**: Reference chromosome name.  
+2. **coor**: Reference coordinate.  
+3. **num\_records\_above\_threshold**: Count of bases classified as Z (high probability).  
+4. **num\_records\_below\_threshold**: Count of bases classified as A (low probability).  
+5. **ratio\_above\_threshold**: The Z-ratio (Count\_Z / Total).
 
 ## **Example Analysis**
 We provide example datasets to test the Z-Calling modules. The data includes:
