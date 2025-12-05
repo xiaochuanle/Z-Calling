@@ -189,8 +189,8 @@ build/zfreq -i <Input_TSV> -o <Output_Freq.tsv>
 
 1. **chr**: Reference chromosome name.  
 2. **coor**: Reference coordinate.  
-3. **num_records_above_threshold**: Count of bases classified as Z (high probability).  
-4. **num_records_below_threshold**: Count of bases classified as A (low probability).  
+3. **num_records_above_threshold**: Count of bases classified as Z (high Z probability score).  
+4. **num_records_below_threshold**: Count of bases classified as A (low Z probability score).  
 5. **ratio_above_threshold**: The Z-ratio (Count_Z / Total).
 
 ## **Example Analysis**
